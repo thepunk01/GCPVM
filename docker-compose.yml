@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gcp-vm-panel-backend
+    ports:
+      - "9001:9001"
+    env_file:
+      - .env
+    volumes:
+      - panel_data:/gcp-vm-panel/data
+    networks:
+      - my_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: gcp-vm-panel-frontend
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+    networks:
+      - my_network
+    environment:
+      - BACKEND_URL=http://backend:9001  # Tell Streamlit to connect to FastAPI
+
+volumes:
+  panel_data:
+
+networks:
+  my_network:
+    driver: bridge
+
+
